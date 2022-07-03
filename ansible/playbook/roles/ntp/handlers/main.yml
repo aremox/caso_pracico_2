@@ -1,0 +1,6 @@
+---
+# Llamadas para NTP
+- name: reiniciar ntp
+  service:
+    name: chronyd
+    state: restarted

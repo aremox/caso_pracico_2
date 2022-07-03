@@ -1,0 +1,5 @@
+---
+- hosts: terminal
+  become: true
+  roles:
+    - nfs

@@ -1,0 +1,6 @@
+---
+# Llamadas para NFS
+- name: reiniciar nfs
+  service:
+    name: nfs-server
+    state: restarted

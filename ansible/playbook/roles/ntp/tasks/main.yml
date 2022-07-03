@@ -1,0 +1,32 @@
+---
+# Instalar y configurar NTP/chrony
+
+- name: Instalar chrony
+  package: name=chrony state=present
+
+- name: Set timezone.
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: Arrancar chrony
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Copiar fichero de chrony
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reiniciar ntp
+
+- name: Sincronizar hora 
+  shell: "chronyc makestep; chronyc tracking;chronyc sources;date"
+  register: resultado
+
+- name: Imprimir salida
+  debug:
+    msg: "{{ resultado.stdout_lines }}"

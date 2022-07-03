@@ -1,0 +1,56 @@
+---
+# Instalar NFS
+- name: Crear directorio de exportacion
+  file:
+    path: "{{nfs_directorio}}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Instalar NFS
+  package: 
+    name: "{{item }}"
+    state: present
+  with_items:
+    - nfs-utils
+    - nfs4-acl-tools
+
+- name: Montar NFS
+  mount:
+    src: 192.168.50.2:/nfs_k8s
+    path: "{{nfs_directorio}}"
+    opts: rw,sync,hard
+    boot: yes
+    state: mounted
+    fstype: nfs
+
+- name: Listar puntos de montaje 
+  shell: "df -h"
+  register: resultado_df
+
+- name: Imprimir salida puntos de montaje 
+  debug:
+    msg: "{{ resultado_df.stdout_lines }}"
+
+- name: Arrancar firewall
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: reglas de firewall
+  firewalld:
+    service: "{{item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items: "{{service_firewall}}"
+
+- name: Recargar reglas del firewall 
+  shell: "firewall-cmd --list-all; firewall-cmd --list-services"
+  register: resultado_fw
+
+- name: Imprimir salida firewall
+  debug:
+    msg: "{{ resultado_fw.stdout_lines }}"

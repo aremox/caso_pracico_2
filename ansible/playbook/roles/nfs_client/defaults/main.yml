@@ -1,0 +1,6 @@
+---
+# Variables para NFS
+
+nfs_directorio: "/imp/nfs_k8s"
+service_firewall: ["nfs","rpc-bind","mountd"]
+

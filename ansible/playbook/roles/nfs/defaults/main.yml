@@ -1,0 +1,6 @@
+---
+# Variables para NFS
+
+nfs_exports: [ "/nfs_k8s *(rw,sync,no_root_squash)" ]
+service_firewall: ["nfs","rpc-bind","mountd"]
+

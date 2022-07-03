@@ -1,0 +1,54 @@
+---
+# Instalar NFS
+- name: Crear directorio de exportacion
+  file:
+    path: /nfs_k8s
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Instalar NFS
+  package: name=nfs-utils state=present
+
+- name: Arrancar rpcbind 
+  service:
+    name: rpcbind
+    state: started
+    enabled: true
+
+- name: Copiar fichero de exportacion
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: reiniciar nfs
+
+- name: Arrancar en servicio NFS
+  service: "name=nfs-server state=started enabled=yes"
+
+- name: Recargar configuracion y listar directorios expuestos 
+  shell: "exportfs -arv; exportfs -s"
+  register: resultado_nfs
+
+- name: Imprimir salida
+  debug:
+    msg: "{{ resultado_nfs.stdout_lines }}"
+    
+- name: reglas de firewall
+  firewalld:
+    service: "{{item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items: "{{service_firewall}}"
+
+- name: Recargar del firewall 
+  shell: "firewall-cmd --list-all; firewall-cmd --list-services"
+  register: resultado_fw
+
+- name: Imprimir salida firewall
+  debug:
+    msg: "{{ resultado_fw.stdout_lines }}"

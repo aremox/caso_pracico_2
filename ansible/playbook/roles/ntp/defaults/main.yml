@@ -1,0 +1,4 @@
+---
+# Variables para NTP
+ntp_timezone: Europe/Madrid
+ntp_servers: [ "pool.ntp.org","hora.roa.es","minuto.roa.es","hora.rediris.es","cuco.rediris.es","ntp1.software.imdea.org","tic.redcayle.es","tac.redcayle.es","hora.cica.es","ntp.i2t.ehu.es" ]
