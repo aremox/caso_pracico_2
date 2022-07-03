@@ -1,0 +1,131 @@
+---
+# Instalar k8s
+- name: Desactivar SELINUX
+  selinux:
+    state: disabled
+
+#- name: actualizar sistema
+#  yum: 
+#    name: "*" 
+#    state: latest
+#    disable_excludes: all
+#    exclude: kubernetes
+
+
+- name: Instalar wget
+  package: name=wget state=present
+
+- name: Añadir modulo br_netfilter
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Añadir masquerade FW
+  firewalld:
+    masquerade: yes
+    state: enabled
+    permanent: yes
+
+- name: Poner parametros kernel
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: '1'
+    sysctl_file: /etc/sysctl.d/k8s.conf
+    reload: yes
+  with_items:
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.bridge.bridge-nf-call-iptables
+    - net.ipv4.ip_forward
+
+- name: Desactivar swap
+  command: swapoff -a
+
+- name: Quitar swap permanentemente
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: Download CRI-O
+  ansible.builtin.get_url:
+    url: "{{ item }}"
+    dest: /etc/yum.repos.d/
+    mode: '0440'
+  with_items:
+    - "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/devel:kubic:libcontainers:stable.repo"
+    - "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ version }}/{{ os }}/devel:kubic:libcontainers:stable:cri-o:{{ version }}.repo"
+
+- name: Instalar CRI-O
+  package: 
+    name: cri-o
+    state: present
+
+- name: Copiar fichero de cri-o
+  template:
+    src: crio.conf.j2
+    dest: /etc/modules-load.d/crio.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Arrancar CRI-O
+  service:
+    name: crio
+    state: started
+    enabled: true
+
+- name: Repositorio k8s
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes Repository
+    baseurl: http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: 
+      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+
+- name: Instalar paquetes 
+#  yum:
+#    name: "{{ item }}"
+#    state: latest
+#    disable_excludes: all
+#    exclude: kubernetes
+#  with_items:
+#    - kubelet
+#    - kubeadm
+#    - kubectl
+  shell: "dnf -y install kubelet kubeadm kubectl iproute-tc --disableexcludes=kubernetes"
+
+- name: Activar kubelet
+  service:
+    name: kubelet
+    state: started
+    enabled: true
+
+- name: reglas de firewall
+  firewalld:
+    port: "{{item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items: "{{port_firewall}}"
+
+- name: Recargar del firewall 
+  shell: "firewall-cmd --list-all; firewall-cmd --list-services"
+  register: resultado_fw
+
+- name: Imprimir salida firewall
+  debug:
+    msg: "{{ resultado_fw.stdout_lines }}"
+
+- name: unir a master
+  shell: "kubeadm join {{ ip_server }}:6443 --token {{ token }} --discovery-token-ca-cert-hash sha256:{{ discovery-token }}"
+  register: resultado_unir
+
+- name: Imprimir salida unir a master
+  debug:
+    msg: "{{ resultado_unir.stdout_lines }}"
+

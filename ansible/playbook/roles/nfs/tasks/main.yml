@@ -33,6 +33,12 @@
   shell: "exportfs -arv; exportfs -s"
   register: resultado_nfs
 
+- name: Arrancar firewall
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
 - name: Imprimir salida
   debug:
     msg: "{{ resultado_nfs.stdout_lines }}"

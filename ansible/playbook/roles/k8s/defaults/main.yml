@@ -1,0 +1,12 @@
+---
+# Variables para K8S
+
+version: 1.24
+os: CentOS_8_Stream
+port_firewall: ["6443/tcp","2379-2380/tcp", "10250/tcp","10251/tcp","10252/tcp","10255/tcp","8285/udp", "8472/udp"]
+red_pod: 192.168.60.0/24
+ip_server: 192.168.50.11
+usuario: vagrant
+grupo: vagrant
+
+
