@@ -5,8 +5,8 @@ version: 1.24
 os: CentOS_8_Stream
 port_firewall: ["30000-32767/tcp", "10250/tcp","8285/udp", "8472/udp"]
 ip_server: 192.168.50.11
-token: 72aike.xw55cnrt8mdaaw5c
-discovery-token: 4ef5b122ad5417c0b08ae085b05d530ea326995c56a4a57cb156cfae7a1a5d30
+token: "kx4mqc.iors2rl6h234cy4w"
+discovery_token: "eae2a3cd52a7ae8397ee605903735b8c7fafdd2f7f74d7d32dc5597849d4b9bb"
 usuario: vagrant
 grupo: vagrant
 

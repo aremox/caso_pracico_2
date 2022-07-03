@@ -133,7 +133,7 @@
     msg: "{{ resultado_fw.stdout_lines }}"
 
 - name: Configurar kubeadm
-  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ip_server }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
+  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ip_server }} --apiserver-cert-extra-sans={{ ip_server }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
   register: resultado_ka
 
 - name: Imprimir salida kubeadm
