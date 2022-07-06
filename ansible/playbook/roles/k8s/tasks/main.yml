@@ -1,20 +1,17 @@
 ---
 # Instalar k8s
+- name: Quitar interface 0
+  shell: echo "DEVICE=eth0" > /etc/sysconfig/network-scripts/ifcfg-eth0 && service network restart
+  ignore_errors: yes
+    
 - name: Desactivar SELINUX
   selinux:
     state: disabled
-
-- name: Crear usuario kube
-  group:
-    name: kube
-    state: present
-
-- name: Crear usuario kube
-  user:
-    name: kubernetes
-    comment: Usuario para kubernetes
-    group: kube
-
+  notify: reiniciar
+  
+- name: Unconditionally reboot the machine with all defaults
+  reboot:
+  
 #- name: actualizar sistema
 #  yum: 
 #    name: "*" 
@@ -108,7 +105,7 @@
 #    - kubelet
 #    - kubeadm
 #    - kubectl
-  shell: "dnf -y install kubelet kubeadm kubectl --disableexcludes=kubernetes"
+  shell: "dnf -y install iproute-tc kubelet kubeadm kubectl --disableexcludes=kubernetes"
 
 - name: Activar kubelet
   service:
@@ -133,7 +130,7 @@
     msg: "{{ resultado_fw.stdout_lines }}"
 
 - name: Configurar kubeadm
-  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ip_server }} --apiserver-cert-extra-sans={{ ip_server }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
+  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ip_server }} --apiserver-cert-extra-sans={{ ip_server }} --node-name={{ nombre }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
   register: resultado_ka
 
 - name: Imprimir salida kubeadm
@@ -176,12 +173,28 @@
     group: root
     mode: 0644
 
+#- name: Instalar Calico y Ingres
+#  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
+#  register: resultado_calico
+#  become: false
+
 - name: Instalar Calico y Ingres
-  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
+  shell: "kubectl apply -f /tmp/custom-resources.yaml"
   register: resultado_calico
   become: false
 
 - name: Imprimir salida calico y Ingres
   debug:
     msg: "{{ resultado_calico.stdout_lines }}"
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Copy join command for {{ k8s_cluster_name }} cluster to local file
+  become: false
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ nombre }}-join-command"
+  
+- name: Setting host facts using key=value pairs, this format can only create strings or booleans
+  set_fact: node_fact="{{ join_command.stdout_lines[0] }}"
 

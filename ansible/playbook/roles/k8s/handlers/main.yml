@@ -1,2 +1,4 @@
 ---
 # Llamadas para k8s
+- name: reiniciar
+  reboot:

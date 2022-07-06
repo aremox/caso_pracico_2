@@ -1,5 +1,9 @@
 ---
 # Instalar k8s
+- name: Quitar interface 0
+  shell: echo "DEVICE=eth0" > /etc/sysconfig/network-scripts/ifcfg-eth0 && service network restart
+  ignore_errors: yes
+  
 - name: Desactivar SELINUX
   selinux:
     state: disabled
@@ -121,12 +125,12 @@
   debug:
     msg: "{{ resultado_fw.stdout_lines }}"
 
-- name: unir a master
-  shell: "kubeadm join {{ ip_server }}:6443 --token {{ token }} --discovery-token-ca-cert-hash sha256:{{ discovery_token }}"
+#- name: unir a master
+#  shell: "kubeadm join {{ ip_server }}:6443 --token {{ token }} --discovery-token-ca-cert-hash sha256:{{ discovery_token }}"
   #shell: "kubeadm join 192.168.50.11:6443 --token oovmxz.5np4ik7cnvnz0q5t --discovery-token-ca-cert-hash sha256:3cf8196acb7df32fe310fee68ca167c7f1bc59552aa0570c1cbdade3946f29ae"
-  register: resultado_unir
+#  register: resultado_unir
 
 - name: Imprimir salida unir a master
   debug:
-    msg: "{{ resultado_unir.stdout_lines }}"
+    msg: "{{ node_fact }}"
 
