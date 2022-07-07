@@ -8,6 +8,8 @@
   selinux:
     state: disabled
 
+- name: Reiniciaar
+  reboot:
 #- name: actualizar sistema
 #  yum: 
 #    name: "*" 
@@ -129,7 +131,17 @@
 #  shell: "kubeadm join {{ ip_server }}:6443 --token {{ token }} --discovery-token-ca-cert-hash sha256:{{ discovery_token }}"
   #shell: "kubeadm join 192.168.50.11:6443 --token oovmxz.5np4ik7cnvnz0q5t --discovery-token-ca-cert-hash sha256:3cf8196acb7df32fe310fee68ca167c7f1bc59552aa0570c1cbdade3946f29ae"
 #  register: resultado_unir
+- name: Copiar fichero de union al cluster {{ nombre }} cluster
+  copy: 
+    src: "./{{ nombre }}-join-command" 
+    dest: /tmp/{{ nombre }}-join-command
+    owner: "{{ usuario }}"
+    group: "{{ grupo }}"
+    mode: 0760  
 
+- name: Unir  node al cluster {{ nombre }}
+  command: sh /tmp/{{ nombre }}-join-command
+  
 - name: Imprimir salida unir a master
   debug:
     msg: "{{ node_fact }}"

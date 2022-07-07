@@ -7,9 +7,8 @@
 - name: Desactivar SELINUX
   selinux:
     state: disabled
-  notify: reiniciar
   
-- name: Unconditionally reboot the machine with all defaults
+- name: Reiniciaar
   reboot:
   
 #- name: actualizar sistema
@@ -172,6 +171,14 @@
     owner: root
     group: root
     mode: 0644
+    
+- name: Copiar fichero de canal.yaml
+  template:
+    src: canal.yaml.j2
+    dest: /tmp/canal.yaml
+    owner: root
+    group: root
+    mode: 0644
 
 #- name: Instalar Calico y Ingres
 #  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
@@ -179,7 +186,7 @@
 #  become: false
 
 - name: Instalar Calico y Ingres
-  shell: "kubectl apply -f /tmp/custom-resources.yaml"
+  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
   register: resultado_calico
   become: false
 
@@ -196,5 +203,7 @@
   local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ nombre }}-join-command"
   
 - name: Setting host facts using key=value pairs, this format can only create strings or booleans
-  set_fact: node_fact="{{ join_command.stdout_lines[0] }}"
+  set_fact: node_fact="{{ join_command.stdout_lines[0] }}" cacheable=yes
 
+- name: Reiniciaar
+  reboot:
