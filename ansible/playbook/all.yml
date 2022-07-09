@@ -1,24 +1,24 @@
 ---
-#- hosts: terminal
-#  become: true
-#  roles:
-#    - nfs
+- hosts: terminal
+  become: true
+  roles:
+    - nfs
 
-#- hosts: all
-#  become: true
-#  roles:
-#    - ntp
-#    - nfs_client
+- hosts: all
+  become: true
+  roles:
+    - ntp
+    - nfs_client
 
-#- hosts: master
-#  become: true
-#  roles:
-#    - k8s
+- hosts: master
+  become: true
+  roles:
+    - k8s
 
-#- hosts: node
-#  become: true
-#  roles:
-#    - k8s_node
+- hosts: node
+  become: true
+  roles:
+    - k8s_node
 
 - hosts: master
   become: false
