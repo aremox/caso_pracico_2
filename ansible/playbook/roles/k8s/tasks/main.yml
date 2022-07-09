@@ -1,5 +1,8 @@
 ---
 # Instalar k8s
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+  
 - name: Quitar interface 0
   shell: echo "DEVICE=eth0" > /etc/sysconfig/network-scripts/ifcfg-eth0 && service network restart
   ignore_errors: yes

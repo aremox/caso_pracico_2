@@ -4,18 +4,23 @@
 #  roles:
 #    - nfs
 
-- hosts: all
-  become: true
-  roles:
-    - ntp
-    - nfs_client
+#- hosts: all
+#  become: true
+#  roles:
+#    - ntp
+#    - nfs_client
+
+#- hosts: master
+#  become: true
+#  roles:
+#    - k8s
+
+#- hosts: node
+#  become: true
+#  roles:
+#    - k8s_node
 
 - hosts: master
-  become: true
+  become: false
   roles:
-    - k8s
-
-- hosts: node
-  become: true
-  roles:
-    - k8s_node
+    - despliegue

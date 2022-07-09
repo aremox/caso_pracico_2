@@ -1,6 +1,8 @@
 ---
 # Instalar y configurar NTP/chrony
-
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+  
 - name: Instalar chrony
   package: name=chrony state=present
 

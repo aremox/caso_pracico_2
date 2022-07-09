@@ -1,0 +1,64 @@
+---
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+
+# Despliegue aplicacion practica caso 2
+- name: Instalar cli py de openshift
+  ansible.builtin.pip:
+    name: openshift
+
+- name: Crear un namespace
+  kubernetes.core.k8s:
+    name: "{{ namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Crear almacenamiento (PV y PVC)
+  kubernetes.core.k8s:
+    state: present
+    template: 'nfs-pv-pvc.yaml.j2'
+    
+- name: Crear POD y servicio "{{ nombreapp }}"
+  kubernetes.core.k8s:
+    state: present
+    template: 'web-nfs.yaml.j2'
+
+- name: Crear Ingress "{{ nombreapp }}"
+  kubernetes.core.k8s:
+    state: present
+    template: 'ingress.yaml.j2'
+
+- name: Crear config HAProxy "{{ nombreapp }}"
+  kubernetes.core.k8s:
+    state: present
+    template: 'configmap.yaml.j2'
+
+- name: Nateo de HAProxy
+  shell: "kubectl get svc haproxy-kubernetes-ingress --namespace=haproxy-controller -o=jsonpath='{.spec.ports[?(@.port==80)].nodePort}'"
+  register: resultado_haproxy
+
+- name: Imprimir Nateo de HAProxy
+  debug:
+    msg: "{{ resultado_haproxy.stdout }}"
+
+- name: Add IP address of all hosts to all hosts
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ maquina }}$'
+    line: "{{ip_server}} {{ maquina }}"
+    state: present
+
+- name: Obtener web
+  uri:
+    url: "http://{{ maquina }}:{{ resultado_haproxy.stdout }}/{{ apppath }}"
+  register: web
+  
+- name: Imprimir web
+  debug:
+    msg: "{{ web }}"
+
+- name: Borrar todo
+  import_tasks: 99-borrar.yml
+  when: borrar == "true"

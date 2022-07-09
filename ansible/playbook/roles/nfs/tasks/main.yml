@@ -1,5 +1,8 @@
 ---
 # Instalar NFS
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+
 - name: Crear directorio de exportacion
   file:
     path: /nfs_k8s

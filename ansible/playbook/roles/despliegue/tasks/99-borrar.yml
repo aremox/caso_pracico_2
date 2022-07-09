@@ -1,0 +1,39 @@
+- name: Borrar Ingress 
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Ingress
+    namespace: "{{ namespace }}"
+    name: "{{ nombreapp }}-ingress"
+
+- name: Borrar SVC 
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: svc
+    namespace: "{{ namespace }}"
+    name: "{{ nombreapp }}-service"
+    
+- name: Borrar pvc 
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: pvc
+    namespace: "{{ namespace }}"
+    name: "{{ nombreapp }}-pvc"
+
+- name: Borrar pvc 
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: pv
+    namespace: "{{ namespace }}"
+    name: "{{ nombreapp }}-pv"
+    
+- name: Borrar namespace 
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: namespace
+    namespace: "{{ namespace }}"
+    name: "{{ namespace }}"

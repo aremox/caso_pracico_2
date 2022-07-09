@@ -1,5 +1,8 @@
 ---
 # Instalar NFS
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+
 - name: Crear directorio de exportacion
   file:
     path: "{{nfs_directorio}}"
@@ -16,14 +19,14 @@
     - nfs-utils
     - nfs4-acl-tools
 
-- name: Montar NFS
-  mount:
-    src: 192.168.50.2:/nfs_k8s
-    path: "{{nfs_directorio}}"
-    opts: rw,sync,hard
-    boot: yes
-    state: mounted
-    fstype: nfs
+#- name: Montar NFS
+#  mount:
+#    src: "{{ nfs_server }}:/nfs_k8s"
+#    path: "{{nfs_directorio}}"
+#    opts: rw,sync,hard
+#    boot: yes
+#    state: mounted
+#    fstype: nfs
 
 - name: Listar puntos de montaje 
   shell: "df -h"
