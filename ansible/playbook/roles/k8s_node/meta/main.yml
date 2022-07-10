@@ -1,6 +1,6 @@
 galaxy_info:
   author: Iván Arenas
-  description: Configurar NFS para practica UNIR.
+  description: Configurar nodos de k8s para practica UNIR.
   company: UNIR.
 
   license: MIT
@@ -12,6 +12,6 @@ galaxy_info:
     versions:
     - 8
   galaxy_tags:
-    - nfs
+    - k8s
 
 dependencies: []
