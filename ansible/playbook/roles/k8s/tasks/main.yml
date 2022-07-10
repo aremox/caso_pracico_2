@@ -15,11 +15,12 @@
   reboot:
   
 #- name: actualizar sistema
-#  yum: 
+#  dnf: 
 #    name: "*" 
 #    state: latest
 #    disable_excludes: all
 #    exclude: kubernetes
+#  shell: "dnf -y update --disableexcludes=kubernetes"
 
 
 - name: Instalar wget
@@ -57,7 +58,7 @@
     replace: '#\1\2\3swap\4'
     backup: yes
 
-- name: Download CRI-O
+- name: Repositorio CRI-O
   ansible.builtin.get_url:
     url: "{{ item }}"
     dest: /etc/yum.repos.d/
@@ -98,7 +99,7 @@
 
 
 - name: Instalar paquetes 
-#  yum:
+#  dnf:
 #    name: "{{ item }}"
 #    state: latest
 #    disable_excludes: all
@@ -183,7 +184,12 @@
     group: root
     mode: 0644
 
-#- name: Instalar Calico y Ingres
+- name: Pausa de 1 minuto
+  ansible.builtin.pause:
+    minutes: 1
+
+
+#- name: Instalar Calico, Canal y Ingres
 #  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
 #  register: resultado_calico
 #  become: false
@@ -197,16 +203,21 @@
   debug:
     msg: "{{ resultado_calico.stdout_lines }}"
 
-- name: Generate join command
+- name: Generar comando de union
   command: kubeadm token create --print-join-command
   register: join_command
 
-- name: Copy join command for {{ k8s_cluster_name }} cluster to local file
+- name: Copiar comando {{ nombre }} cluster a local
   become: false
   local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ nombre }}-join-command"
-  
-- name: Setting host facts using key=value pairs, this format can only create strings or booleans
-  set_fact: node_fact="{{ join_command.stdout_lines[0] }}" cacheable=yes
 
+- name: Pausa de 1 minuto para que se configuren los POD
+  ansible.builtin.pause:
+    minutes: 1
+    
 - name: Reiniciaar
   reboot:
+
+- name: Pausa de 5 minuto para que arranque K8s
+  ansible.builtin.pause:
+    minutes: 5

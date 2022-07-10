@@ -11,4 +11,5 @@ nombreapp: "web-nfs"
 maquina: "practica"
 apppath: "practica"
 port: "31821"
+nfs_directorio: "/imp/nfs_k8s"
 

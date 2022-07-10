@@ -1,10 +1,36 @@
 ---
+# Despliegue aplicacion practica caso 2
 - name: include vars globales
   include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
 
-# Despliegue aplicacion practica caso 2
+- name: Montar NFS
+  become: true
+  mount:
+    src: "{{ nfs_server }}:/nfs_k8s"
+    path: "{{nfs_directorio}}"
+    opts: rw,sync,hard
+    boot: no
+    state: mounted
+    fstype: nfs
+    
+- name: Copiar fichero index.html
+  become: true
+  template:
+    src: index.html.j2
+    dest: "{{nfs_directorio}}/index.html"
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0644
+
+- name: Unmount NFS
+  become: true
+  ansible.posix.mount:
+    path: "{{nfs_directorio}}"
+    state: unmounted
+
 - name: Instalar cli py de openshift
-  ansible.builtin.pip:
+  become: true
+  pip:
     name: openshift
 
 - name: Crear un namespace
@@ -42,13 +68,21 @@
   debug:
     msg: "{{ resultado_haproxy.stdout }}"
 
-- name: Add IP address of all hosts to all hosts
+- name: Ip del nodo del HAProxy
+  shell: "kubectl describe pod haproxy-kubernetes-ingress-default-backend --namespace=haproxy-controller |grep -i 10.0. | cut -d \/ -f2"
+  register: ip_haproxy
+  
+- name: Añadir Ip al /etc/hosts
   become: true
   lineinfile:
     dest: /etc/hosts
     regexp: '.*{{ maquina }}$'
-    line: "{{ip_server}} {{ maquina }}"
-    state: present
+    line: "{{ip_haproxy.stdout}} {{ maquina }}"
+    backrefs: no
+
+- name: Pausa de 3 minuto para que se configuren los POD
+  ansible.builtin.pause:
+    minutes: 3
 
 - name: Obtener web
   uri:

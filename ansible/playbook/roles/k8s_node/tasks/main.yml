@@ -121,7 +121,7 @@
     permanent: true
     immediate: true
   with_items: "{{port_firewall}}"
-
+  
 - name: Recargar del firewall 
   shell: "firewall-cmd --list-all; firewall-cmd --list-services"
   register: resultado_fw
@@ -142,10 +142,16 @@
     group: "{{ grupo }}"
     mode: 0760  
 
+- name: Pausa de 1 minuto para que se configuren los POD
+  ansible.builtin.pause:
+    minutes: 1
+
 - name: Unir  node al cluster {{ nombre }}
   command: sh /tmp/{{ nombre }}-join-command
-  
-- name: Imprimir salida unir a master
-  debug:
-    msg: "{{ node_fact }}"
 
+- name: Reiniciaar
+  reboot:
+
+- name: Pausa de 3 minuto para que se configuren los POD
+  ansible.builtin.pause:
+    minutes: 3

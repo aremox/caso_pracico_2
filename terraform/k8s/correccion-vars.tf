@@ -27,30 +27,19 @@ variable "path_rsa" {
 }
 
 variable "availability-zones" {
-type = list(string)
-default = [
-"1", "2", "3",
-"1", "2", "3",
-]
+  type = list(string)
+  default = [
+    "1", "2", "3",
+    "1", "2", "3",
+  ]
 }
 
 variable "availability-size" {
-type = list(string)
-default = [
-"Standard_B2s",
-"Standard_B1ms",
-"Standard_B1ms",
-"Standard_B1ls"
-]
-}
-
-resource "local_file" "ansible_inventory" {
-  content = templatefile("inventory.tmpl",
-    {
-     value = "${azurerm_public_ip.publicip.*.ip_address}"
-     usuario = "${ var.usuario }"
-     path_rsa = "${var.path_rsa}"
-    }
-  )
-  filename = "/etc/ansible/inventory"
+  type = list(string)
+  default = [
+    "Standard_B2s",
+    "Standard_B1ms",
+    "Standard_B1ms",
+    "Standard_B1ls"
+  ]
 }

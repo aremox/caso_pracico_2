@@ -67,16 +67,16 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
   
    plan {
-    name      = "centos-8-stream-free"
-    product   = "centos-8-stream-free"
-    publisher = "cognosys"
+    name      = "8_5"
+    product   = "almalinux"
+    publisher = "almalinux"
   }
 
   source_image_reference {
-    publisher                       = "cognosys"
-    offer                           = "centos-8-stream-free"
-    sku                             = "centos-8-stream-free"
-    version                         = "22.03.28"
+    publisher                       = "almalinux"
+    offer                           = "almalinux"
+    sku                             = "8_5"
+    version                         = "8.5.20220311"
   }
 
 }
