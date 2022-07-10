@@ -13,7 +13,7 @@
     state: mounted
     fstype: nfs
     
-- name: Copiar fichero index.html
+- name: Copiar fichero index.html al NFS para mostrar algo en el NGINX
   become: true
   template:
     src: index.html.j2

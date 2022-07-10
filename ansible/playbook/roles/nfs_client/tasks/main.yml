@@ -19,6 +19,7 @@
     - nfs-utils
     - nfs4-acl-tools
 
+# Descomentar para montar los NFS en los clientes 
 #- name: Montar NFS
 #  mount:
 #    src: "{{ nfs_server }}:/nfs_k8s"

@@ -2,7 +2,8 @@
 # Instalar k8s
 - name: include vars globales
   include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
-  
+
+# Descomentar si usamos vagrant   
 #- name: Quitar interface 0
 #  shell: echo "DEVICE=eth0" > /etc/sysconfig/network-scripts/ifcfg-eth0 && service network restart
 #  ignore_errors: yes
@@ -10,18 +11,19 @@
 - name: Desactivar SELINUX
   selinux:
     state: disabled
-  
-- name: Reiniciaar
-  reboot:
-  
-#- name: actualizar sistema
+
+# No hemos podido conseguir que el modulo dnf excluya kubernetes, por eso usamos shell 
+- name: actualizar sistema
 #  dnf: 
 #    name: "*" 
 #    state: latest
 #    disable_excludes: all
 #    exclude: kubernetes
-#  shell: "dnf -y update --disableexcludes=kubernetes"
+  shell: "dnf -y update --disableexcludes=kubernetes"
 
+# Reinicinamos para aplicar la desactivacion de SELINUX  y si hay updates que lo necesiten
+- name: Reiniciaar
+  reboot:
 
 - name: Instalar wget
   package: name=wget state=present
@@ -97,7 +99,7 @@
       - https://packages.cloud.google.com/yum/doc/yum-key.gpg
       - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
-
+# No hemos podido conseguir que el modulo dnf excluya kubernetes, por eso usamos shell 
 - name: Instalar paquetes 
 #  dnf:
 #    name: "{{ item }}"
@@ -188,16 +190,12 @@
   ansible.builtin.pause:
     minutes: 1
 
-
-#- name: Instalar Calico, Canal y Ingres
+# No hemos podido hacer funcionar canal, pero no nos ha hecho falta y lo hemos hecho funcionar todo sin el  
+- name: Instalar Calico, Canal y Ingres
 #  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-#  register: resultado_calico
-#  become: false
-
-- name: Instalar Calico y Ingres
-  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-  register: resultado_calico
-  become: false
+   shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
+   register: resultado_calico
+   become: false
 
 - name: Imprimir salida calico y Ingres
   debug:
