@@ -60,11 +60,11 @@
     state: present
     template: 'configmap.yaml.j2'
 
-- name: Nateo de HAProxy
+- name: Obtener el puerto de nateo de HAProxy
   shell: "kubectl get svc haproxy-kubernetes-ingress --namespace=haproxy-controller -o=jsonpath='{.spec.ports[?(@.port==80)].nodePort}'"
   register: resultado_haproxy
 
-- name: Imprimir Nateo de HAProxy
+- name: Imprimir puerto de nateo de HAProxy
   debug:
     msg: "{{ resultado_haproxy.stdout }}"
 
