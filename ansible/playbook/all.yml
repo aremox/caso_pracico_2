@@ -1,25 +1,33 @@
 ---
+# Playbook para lanzar todos los roles 
+# Se iran lanzando los roles enpezando por el NFS y terminando con el despliegue de la aplicación 
+
+# Rol de montaje del NFS
 - hosts: nfs
   become: true
   roles:
     - nfs
 
+# Rol de configuracion de la hora y de los clientes NFS 
 - hosts: all
   become: true
   roles:
     - ntp
     - nfs_client
 
+# Rol de instalacion de K8S
 - hosts: master
   become: true
   roles:
     - k8s
 
+# Rol de la instalacion de los nodos de K8S
 - hosts: node
   become: true
   roles:
     - k8s_node
 
+# Rol de despliegue de la aplicacion NGINX
 - hosts: master
   become: false
   roles:
