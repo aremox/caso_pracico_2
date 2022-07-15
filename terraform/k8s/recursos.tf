@@ -51,7 +51,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location              = azurerm_resource_group.rg.location
   size			            = element(var.availability-size, (count.index))
   zone                  = element(var.availability-zones, (count.index))
-  admin_username        = "azureuser"
+  admin_username        = var.usuario
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,
   ]
@@ -82,18 +82,18 @@ resource "azurerm_linux_virtual_machine" "vm" {
 }
 
 resource "azurerm_managed_disk" "data" {
-  count                 = var.num_maquinas
+  count                 = 1
   name                  = "data${count.index}"
   location              = azurerm_resource_group.rg.location
   create_option         = "Empty"
-  disk_size_gb          = 1
+  disk_size_gb          = var.disco
   resource_group_name   = azurerm_resource_group.rg.name
   storage_account_type  = "Standard_LRS"
   zone                  = element(var.availability-zones, (count.index))
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data" {
-    count               = var.num_maquinas
+    count               = 1
     virtual_machine_id  = azurerm_linux_virtual_machine.vm[count.index].id
     managed_disk_id     = azurerm_managed_disk.data[count.index].id
     lun                 = 0

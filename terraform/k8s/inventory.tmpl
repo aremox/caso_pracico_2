@@ -1,12 +1,12 @@
 [nfs]
 ${pubip[0]} 
 
-[master:children]
-${pubip[0]} 
+[master]
+${pubip[1]} 
 
 [node]
-${pubip[1]} 
 ${pubip[2]} 
+${pubip[3]} 
 
 [k8s:children]
 master

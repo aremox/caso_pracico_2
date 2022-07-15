@@ -28,7 +28,7 @@
     - k8s_node
 
 # Rol de despliegue de la aplicacion NGINX
-- hosts: master
-  become: false
-  roles:
-    - despliegue
+#- hosts: master
+#  become: false
+#  roles:
+#    - despliegue

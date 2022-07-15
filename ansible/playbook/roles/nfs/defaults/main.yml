@@ -1,7 +1,7 @@
 ---
 # Variables para NFS
 
-nfs_exports: [ "/nfs_k8s *(rw,sync,no_root_squash)" ]
+nfs_exports: [ "/nfs_k8s *(rw,sync,no_root_squash)","/nfs_k8s/mysql *(rw,sync,no_root_squash)","/nfs_k8s/wordpress *(rw,sync,no_root_squash)" ]
 nfs_directorio: "/imp/nfs_k8s"
 service_firewall: ["nfs","rpc-bind","mountd"]
 

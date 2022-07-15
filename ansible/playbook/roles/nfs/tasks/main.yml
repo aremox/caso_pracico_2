@@ -10,6 +10,22 @@
     owner: root
     group: root
     mode: 0775
+    
+- name: Crear directorio MySQL
+  file:
+    path: /nfs_k8s/mysql
+    state: directory
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0775  
+    
+- name: Crear directorio wordpress
+  file:
+    path: /nfs_k8s/wordpress
+    state: directory
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0775  
 
 - name: Instalar NFS
   package: name=nfs-utils state=present

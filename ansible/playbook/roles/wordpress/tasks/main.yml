@@ -12,21 +12,12 @@
     boot: no
     state: mounted
     fstype: nfs
-    
-- name: Copiar fichero index.html al NFS para mostrar algo en el NGINX
-  become: true
-  template:
-    src: index.html.j2
-    dest: "{{nfs_directorio}}/index.html"
-    owner: "{{ usuario }}"
-    group: "{{ usuario }}"
-    mode: 0644
 
-- name: Unmount NFS
-  become: true
-  ansible.posix.mount:
-    path: "{{nfs_directorio}}"
-    state: unmounted
+#- name: Unmount NFS
+#  become: true
+#  ansible.posix.mount:
+#    path: "{{nfs_directorio}}"
+#    state: unmounted
 
 - name: Instalar cli py de openshift
   become: true
@@ -44,11 +35,23 @@
   kubernetes.core.k8s:
     state: present
     template: 'nfs-pv-pvc.yaml.j2'
-    
-- name: Crear POD y servicio "{{ nombreapp }}"
+
+# Tendriamos que usar el vault de ansible 
+- name: Crear secret de mysql
+  #shell: "kubectl create secret generic mysql-pass --from-literal=password='qwerty'"
   kubernetes.core.k8s:
     state: present
-    template: 'web-nfs.yaml.j2'
+    template: 'mysecret.yml.j2'
+    
+- name: Crear POD y servicio MYSQL"{{ nombreapp }}"
+  kubernetes.core.k8s:
+    state: present
+    template: 'mysql.yaml.j2'
+
+- name: Crear POD y servicio WORDPRESS"{{ nombreapp }}"
+  kubernetes.core.k8s:
+    state: present
+    template: 'wordpress.yaml.j2'
 
 - name: Crear Ingress "{{ nombreapp }}"
   kubernetes.core.k8s:
@@ -88,7 +91,6 @@
   uri:
     url: "http://{{ maquina }}:{{ resultado_haproxy.stdout }}/{{ apppath }}"
   register: web
-  ignore_errors: yes
   
 - name: Imprimir web
   debug:

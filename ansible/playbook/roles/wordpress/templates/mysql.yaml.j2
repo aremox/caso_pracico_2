@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  namespace: {{namespace}}
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    app: wordpress
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  namespace: {{namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: mariadb:latest
+        name: mysql
+        env:
+          # Use secret in real usage
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-vm
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-vm
+        persistentVolumeClaim:
+          claimName: mysql-pvc

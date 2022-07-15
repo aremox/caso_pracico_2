@@ -13,13 +13,13 @@
     state: disabled
 
 # No hemos podido conseguir que el modulo dnf excluya kubernetes, por eso usamos shell 
-- name: actualizar sistema
+#- name: actualizar sistema
 #  dnf: 
 #    name: "*" 
 #    state: latest
 #    disable_excludes: all
 #    exclude: kubernetes
-  shell: "dnf -y update --disableexcludes=kubernetes"
+#  shell: "dnf -y update --disableexcludes=kubernetes"
 
 # Reinicinamos para aplicar la desactivacion de SELINUX y si hay updates que lo necesiten 
 - name: Reiniciaar
@@ -118,9 +118,15 @@
     state: started
     enabled: true
 
+- name: Arrancar firewall
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
 - name: reglas de firewall
   firewalld:
-    port: "{{item }}"
+    port: "{{ item }}"
     state: enabled
     permanent: true
     immediate: true
@@ -136,7 +142,7 @@
 
 - name: Copiar fichero de union al cluster {{ nombre }} cluster
   copy: 
-    src: "./{{ nombre }}-join-command" 
+    src: "/tmp/{{ nombre }}-join-command" 
     dest: /tmp/{{ nombre }}-join-command
     owner: "{{ usuario }}"
     group: "{{ grupo }}"

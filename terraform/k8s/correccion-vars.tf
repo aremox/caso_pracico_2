@@ -15,7 +15,7 @@ variable "subnet_name" {
 }
 
 variable "num_maquinas" {
-  default = 3
+  default = 4
 }
 
 variable "usuario" {
@@ -24,6 +24,10 @@ variable "usuario" {
 
 variable "path_rsa" {
   default = "/home/vagrant/.ssh/"
+}
+
+variable "disco" {
+  default = 10
 }
 
 variable "availability-zones" {
@@ -37,9 +41,10 @@ variable "availability-zones" {
 variable "availability-size" {
   type = list(string)
   default = [
-    "Standard_B2s",
+    "Standard_B1ls",
+    "Standard_A2_v2",
     "Standard_B1ms",
     "Standard_B1ms",
-    "Standard_B1ls"
+    "Standard_B2s"
   ]
 }

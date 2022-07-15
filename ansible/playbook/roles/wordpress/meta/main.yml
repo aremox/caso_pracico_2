@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Iván Arenas
+  description: Desplegar NGINX en dos nodos y NFS para practica UNIR.
+  company: UNIR.
+
+  license: MIT
+
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: centos
+    versions:
+    - 8
+  galaxy_tags:
+    - k8s
+
+dependencies: []

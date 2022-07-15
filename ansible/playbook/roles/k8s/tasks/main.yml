@@ -13,13 +13,13 @@
     state: disabled
 
 # No hemos podido conseguir que el modulo dnf excluya kubernetes, por eso usamos shell 
-- name: actualizar sistema
+#- name: actualizar sistema
 #  dnf: 
 #    name: "*" 
 #    state: latest
 #    disable_excludes: all
 #    exclude: kubernetes
-  shell: "dnf -y update --disableexcludes=kubernetes"
+#  shell: "dnf -y update --disableexcludes=kubernetes"
 
 # Reinicinamos para aplicar la desactivacion de SELINUX  y si hay updates que lo necesiten
 - name: Reiniciaar
@@ -135,7 +135,7 @@
     msg: "{{ resultado_fw.stdout_lines }}"
 
 - name: Configurar kubeadm
-  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ip_server }} --apiserver-cert-extra-sans={{ ip_server }} --node-name={{ nombre }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
+  shell: "kubeadm config images pull; kubeadm init --apiserver-advertise-address={{ ansible_facts['eth0']['ipv4']['address'] }} --apiserver-cert-extra-sans={{ ansible_facts['eth0']['ipv4']['address'] }} --node-name={{ ansible_facts['nodename'] }} --pod-network-cidr={{ red_pod }}; export KUBECONFIG=/etc/kubernetes/admin.conf"
   register: resultado_ka
 
 - name: Imprimir salida kubeadm
@@ -193,9 +193,9 @@
 # No hemos podido hacer funcionar canal, pero no nos ha hecho falta y lo hemos hecho funcionar todo sin el  
 - name: Instalar Calico, Canal y Ingres
 #  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-   shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-   register: resultado_calico
-   become: false
+  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
+  register: resultado_calico
+  become: false
 
 - name: Imprimir salida calico y Ingres
   debug:
@@ -205,9 +205,9 @@
   command: kubeadm token create --print-join-command
   register: join_command
 
-- name: Copiar comando {{ nombre }} cluster a local
+- name: Copiar comando {{ ansible_facts['nodename'] }} cluster a local
   become: false
-  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ nombre }}-join-command"
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="/tmp/{{ ansible_facts['nodename'] }}-join-command"
 
 - name: Pausa de 1 minuto para que se configuren los POD
   ansible.builtin.pause:
