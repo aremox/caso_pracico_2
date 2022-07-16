@@ -44,7 +44,6 @@ variable "availability-size" {
     "Standard_B1ls",
     "Standard_A2_v2",
     "Standard_B1ms",
-    "Standard_B1ms",
-    "Standard_B2s"
+    "Standard_B1ms"
   ]
 }

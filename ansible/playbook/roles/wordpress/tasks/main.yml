@@ -38,7 +38,6 @@
 
 # Tendriamos que usar el vault de ansible 
 - name: Crear secret de mysql
-  #shell: "kubectl create secret generic mysql-pass --from-literal=password='qwerty'"
   kubernetes.core.k8s:
     state: present
     template: 'mysecret.yml.j2'
