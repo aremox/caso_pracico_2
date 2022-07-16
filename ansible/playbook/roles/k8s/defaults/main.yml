@@ -3,10 +3,8 @@
 
 version: 1.24
 os: CentOS_8_Stream
-nombre: k8s-m-1
-port_firewall: ["179/tcp","4789/udp","6443/tcp","2379-2380/tcp", "10250/tcp","10251/tcp","10252/tcp","10255/tcp","8285/udp", "8472/udp", "5473/tcp", "30000-32767/tcp", "3306/tcp"]
+port_firewall: ["179/tcp","4789/udp","6443/tcp","2379-2380/tcp", "10250/tcp","10251/tcp","10252/tcp","10255/tcp","8285/udp", "8472/udp", "5473/tcp", "30000-32767/tcp"]
 red_pod: 192.168.0.0/16
-ip_server: 192.168.50.11
 usuario: vagrant
 grupo: vagrant
 

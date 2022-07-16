@@ -3,13 +3,11 @@
 
 borrar: "true"
 nfs_server: "192.168.50.2"
-ip_server: "192.168.50.11"
 nfs_path: "/nfs_k8s"
 capacidad: "10Gi"
 namespace: "caso2"
 nombreapp: "web-nfs"
 maquina: "practica"
 apppath: "practica"
-port: "31821"
 nfs_directorio: "/imp/nfs_k8s"
 
