@@ -17,5 +17,5 @@ Este repositorio contiene el código del caso práctico con los siguientes eleme
 3. Copiar caso2.sh
 4. Ejecutar caso2.sh
  
-### destruir entorno del caso práctico 2
+### Destruir entorno del caso práctico 2
 Para destruir el entorno ejecutar __caso2_destroy.sh__
