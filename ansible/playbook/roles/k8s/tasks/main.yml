@@ -160,46 +160,39 @@
     group: "{{ grupo }}"
     mode: '0640'
 
-- name: Instalar el operador Tigera
-  shell: "kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml"
+- name: Instalar Calico
+  shell: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml && kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml"
+#  shell: "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml"
   register: resultado_Tigera
   become: false
-  ignore_errors: yes
+#  ignore_errors: yes
 
-- name: Imprimir salida Tigera
+- name: Imprimir salida Calico
   debug:
     msg: "{{ resultado_Tigera.stdout_lines }}"
-
-- name: Copiar fichero de custom-resources.yaml
-  template:
-    src: custom-resources.yaml.j2
-    dest: /tmp/custom-resources.yaml
-    owner: root
-    group: root
-    mode: 0644
-    
-- name: Copiar fichero de canal.yaml
-  template:
-    src: canal.yaml.j2
-    dest: /tmp/canal.yaml
-    owner: root
-    group: root
-    mode: 0644
 
 - name: Pausa de 1 minuto
   ansible.builtin.pause:
     minutes: 1
 
+- name: Copiar fichero de politicas
+  template:
+    src: policy.json.j2
+    dest: /etc/containers/policy.json
+    owner: root
+    group: root
+    mode: 0644
+
 # No hemos podido hacer funcionar canal, pero no nos ha hecho falta y lo hemos hecho funcionar todo sin el  
-- name: Instalar Calico, Canal y Ingres
+- name: Instalar Ingres
 #  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-  shell: "kubectl apply -f /tmp/custom-resources.yaml; kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
-  register: resultado_calico
+  shell: "kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml"
+  register: resultado_ingres
   become: false
 
-- name: Imprimir salida calico y Ingres
+- name: Imprimir salida canal y Ingres
   debug:
-    msg: "{{ resultado_calico.stdout_lines }}"
+    msg: "{{ resultado_ingres.stdout_lines }}"
 
 - name: Generar comando de union
   command: kubeadm token create --print-join-command

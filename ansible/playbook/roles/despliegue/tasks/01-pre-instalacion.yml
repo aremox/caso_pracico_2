@@ -1,0 +1,32 @@
+- name: include vars globales
+  include_vars: "/etc/ansible/playbook/roles/vars/main.yml"
+
+- name: Montar NFS
+  become: true
+  mount:
+    src: "{{ nfs_server }}:/nfs_k8s"
+    path: "{{nfs_directorio}}"
+    opts: rw,sync,hard
+    boot: no
+    state: mounted
+    fstype: nfs
+    
+- name: Copiar fichero index.html al NFS para mostrar algo en el NGINX
+  become: true
+  template:
+    src: index.html.j2
+    dest: "{{nfs_directorio}}/index.html"
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0644
+
+- name: Unmount NFS
+  become: true
+  ansible.posix.mount:
+    path: "{{nfs_directorio}}"
+    state: unmounted
+
+- name: Instalar cli py de openshift
+  become: true
+  pip:
+    name: openshift

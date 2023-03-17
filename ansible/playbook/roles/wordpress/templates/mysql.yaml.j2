@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wordpress-mysql
-  namespace: {{namespace}}
+  namespace: {{espacionombre}}
 spec:
   ports:
   - port: 3306
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wordpress-mysql
-  namespace: {{namespace}}
+  namespace: {{espacionombre}}
 spec:
   replicas: 1
   selector:
@@ -27,11 +27,13 @@ spec:
         app: wordpress
     spec:
       containers:
-      - image: mariadb:latest
+      - image: mysql:8
         name: mysql
         env:
+        - name: MYSQL_DATABASE
+          value: wordpress
           # Use secret in real usage
-        - name: MARIADB_ROOT_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mysql-pass
@@ -46,3 +48,23 @@ spec:
       - name: mysql-vm
         persistentVolumeClaim:
           claimName: mysql-pvc
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-mysql-wp-configmap
+  namespace: {{espacionombre}}
+data:
+  init.sql: CREATE DATABASE IF NOT EXISTS wordpress;
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  namespace: {{espacionombre}}
+spec:
+  selector:
+    app: wordpress
+  ports:
+    - protocol: TCP
+      port: 3306

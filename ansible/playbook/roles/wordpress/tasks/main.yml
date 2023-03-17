@@ -26,7 +26,7 @@
 
 - name: Crear un namespace
   kubernetes.core.k8s:
-    name: "{{ namespace }}"
+    name: "{{ espacionombre }}"
     api_version: v1
     kind: Namespace
     state: present
@@ -42,12 +42,12 @@
     state: present
     template: 'mysecret.yml.j2'
     
-- name: Crear POD y servicio MYSQL"{{ nombreapp }}"
+- name: Crear POD y servicio MYSQL {{ nombreapp }}
   kubernetes.core.k8s:
     state: present
     template: 'mysql.yaml.j2'
 
-- name: Crear POD y servicio WORDPRESS"{{ nombreapp }}"
+- name: Crear POD y servicio WORDPRESS {{ nombreapp }}
   kubernetes.core.k8s:
     state: present
     template: 'wordpress.yaml.j2'
@@ -71,8 +71,12 @@
     msg: "{{ resultado_haproxy.stdout }}"
 
 - name: Ip del nodo del HAProxy
-  shell: "kubectl describe pod haproxy-kubernetes-ingress-default-backend --namespace=haproxy-controller |grep -i 10.0. | cut -d \/ -f2"
+  shell: "kubectl describe pod haproxy-kubernetes-ingress --namespace=haproxy-controller |grep -i 10.0. | cut -d \/ -f2"
   register: ip_haproxy
+
+- name: Imprimir ip de nateo de HAProxy
+  debug:
+    msg: "{{ ip_haproxy.stdout }}"
   
 - name: Añadir Ip al /etc/hosts
   become: true
